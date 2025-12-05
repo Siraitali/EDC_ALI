@@ -246,6 +246,7 @@ $result = $conn->query("SELECT * FROM mpos ORDER BY id DESC LIMIT $limit OFFSET 
                     <li><a href="#" class="nav-link">NOP Berulang</a></li>
                 </ul>
             </li>
+            
             <li class="nav-item">
                 <a href="#" class="nav-link" data-toggle="submenu" data-target="brilinkMenu" data-arrow="brilinkArrow"><i class="fas fa-link"></i> BRILink <i class="fas fa-angle-left right ms-auto" id="brilinkArrow"></i></a>
                 <ul class="submenu" id="brilinkMenu">

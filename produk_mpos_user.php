@@ -34,7 +34,13 @@ function indoDate($date) {
 
 // ====================== GET DATA ===============================
 $data = $conn->query("SELECT * FROM produk_merchant ORDER BY id ASC");
+$rows = [];
 
+while ($r = $data->fetch_assoc()) {
+    $rows[] = $r;
+}
+
+$lastIndex = count($rows) - 1; // index data terakhir
 ?>
 <!DOCTYPE html>
 <html>
@@ -78,8 +84,10 @@ $data = $conn->query("SELECT * FROM produk_merchant ORDER BY id ASC");
             border-top:1px solid #e5e7eb;
             font-size:14px;
         }
-        .table-modern tbody tr td:first-child { border-radius:10px 0 0 10px; }
-        .table-modern tbody tr td:last-child  { border-radius:0 10px 10px 0; }
+        .table-modern tbody tr:last-child {
+            background:#eaf0ff !important;
+            font-weight:bold;
+        }
 
         h3 { color:#084298; font-weight:700; }
     </style>
@@ -102,18 +110,36 @@ $data = $conn->query("SELECT * FROM produk_merchant ORDER BY id ASC");
             </tr>
         </thead>
         <tbody>
-            <?php while ($row = $data->fetch_assoc()) { ?>
-            <tr>
-                <td><?= $row['id']; ?></td>
-                <td><?= $row['kode_kanca']; ?></td>
-                <td><?= $row['nama_kanca']; ?></td>
-                <td><?= $row['produktif']; ?></td>
-                <td><?= $row['non_produktif']; ?></td>
-                <td><?= $row['total']; ?></td>
-                <td><?= $row['produktivitas_pct']; ?>%</td>
-                <td><?= indoDate($row['created_at']); ?></td>
-            </tr>
+
+            <?php foreach ($rows as $i => $row) { ?>
+
+                <?php if ($i == $lastIndex) { ?>
+                    <!-- ========== BARIS GRAND TOTAL (MODIFIKASI DATA TERAKHIR) ========== -->
+                    <tr style="background:#eaf0ff; font-weight:bold;">
+                        <td></td>
+                        <td colspan="2" style="text-align:center;">Grand Total</td>
+                        <td><?= $row['produktif']; ?></td>
+                        <td><?= $row['non_produktif']; ?></td>
+                        <td><?= $row['total']; ?></td>
+                        <td><?= $row['produktivitas_pct']; ?>%</td>
+                        <td></td>
+                    </tr>
+                <?php } else { ?>
+                    <!-- DATA BIASA -->
+                    <tr>
+                        <td><?= $row['id']; ?></td>
+                        <td><?= $row['kode_kanca']; ?></td>
+                        <td><?= $row['nama_kanca']; ?></td>
+                        <td><?= $row['produktif']; ?></td>
+                        <td><?= $row['non_produktif']; ?></td>
+                        <td><?= $row['total']; ?></td>
+                        <td><?= $row['produktivitas_pct']; ?>%</td>
+                        <td><?= indoDate($row['created_at']); ?></td>
+                    </tr>
+                <?php } ?>
+
             <?php } ?>
+
         </tbody>
     </table>
 </div>
