@@ -357,7 +357,7 @@ if (isset($_POST['submit'])) {
                 </a>
                 <ul class="submenu" id="merchantMenu">
                     <li><a href="wpe_admin.php" class="nav-link">Reliability</a></li>
-                    <li><a href="#" class="nav-link">Produktifitas</a></li>
+                    <li><a href="produk_mpos.php" class="nav-link">Produktifitas</a></li>
                     <li><a href="#" class="nav-link">NOP Berulang</a></li>
                 </ul>
             </li>

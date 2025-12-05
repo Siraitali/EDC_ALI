@@ -200,6 +200,7 @@ if ($conn->connect_error) die("Koneksi gagal: " . $conn->connect_error);
                 <ul class="submenu" id="stokMenu">
                     <li><a href="edc_stok.php" class="nav-link">EDC</a></li>
                     <li><a href="#" class="nav-link">TERMAL</a></li>
+                    <li><a href="upload_mesin.php" class="nav-link">Peta EDC</a></li>
                 </ul>
             </li>
 

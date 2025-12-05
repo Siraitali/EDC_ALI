@@ -285,8 +285,8 @@ if (isset($_POST['import'])) {
                     <i class="fas fa-store"></i><span>Merchant</span><i class="fas fa-angle-left right ms-auto" id="merchantArrow"></i>
                 </a>
                 <ul class="submenu" id="merchantMenu">
-                    <li><a href="#" class="nav-link">Reliability</a></li>
-                    <li><a href="#" class="nav-link">Produktifitas</a></li>
+                    <li><a href="wpe_admin.php" class="nav-link">Reliability</a></li>
+                    <li><a href="produk_mpos.php" class="nav-link">Produktifitas</a></li>
                     <li><a href="#" class="nav-link">NOP Berulang</a></li>
                 </ul>
             </li>

@@ -241,8 +241,8 @@ $result = $conn->query("SELECT * FROM mpos ORDER BY id DESC LIMIT $limit OFFSET 
             <li class="nav-item">
                 <a href="#" class="nav-link" data-toggle="submenu" data-target="merchantMenu" data-arrow="merchantArrow"><i class="fas fa-store"></i> Merchant <i class="fas fa-angle-left right ms-auto" id="merchantArrow"></i></a>
                 <ul class="submenu" id="merchantMenu">
-                    <li><a href="#" class="nav-link">Reliability</a></li>
-                    <li><a href="#" class="nav-link">Produktifitas</a></li>
+                    <li><a href="wpe_admin.php" class="nav-link">Reliability</a></li>
+                    <li><a href="produk_mpos.php" class="nav-link">Produktifitas</a></li>
                     <li><a href="#" class="nav-link">NOP Berulang</a></li>
                 </ul>
             </li>
