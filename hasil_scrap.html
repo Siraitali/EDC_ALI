@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>BRILink | Monitoring MPOS</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/vendor/fontawesome-free/css/all.min.css" rel="stylesheet"
+        type="text/css">
+    <!-- Custom styles for this template-->
+    <link href="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/css/sb-admin-2.css" rel="stylesheet">
+    <link rel='stylesheet' href="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/css/nprogress.css" />
+    <link rel='stylesheet' href="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/css/placeholder-loading.min.css" />
+    <link rel="stylesheet" href="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/css/sweetalert2.min.css">
+    <link href="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/vendor/ladda/ladda-themeless.min.css" rel="stylesheet"
+        type="text/css" />
+</head>
+<style>
+    .right_radius {
+        border-top-right-radius: 13px;
+        /* border-bottom-right-radius:13px; */
+    }
+
+    .refresh {
+        position: fixed;
+        right: 5rem;
+        bottom: 1rem;
+        width: 2.75rem;
+        height: 2.75rem;
+        text-align: center;
+        color: #fff;
+        background: rgba(90, 92, 105, 0.5);
+        line-height: 46px;
+        font-size: 23px;
+    }
+
+    .refresh:focus,
+    .refresh:hover {
+        color: white;
+    }
+
+    .refresh:hover {
+        background: #5a5c69;
+    }
+
+    .refresh i {
+        font-weight: 800;
+    }
+    .expand {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        width: 2.75rem;
+        height: 2.75rem;
+        text-align: center;
+        color: #fff;
+        background: rgba(90, 92, 105, 0.5);
+        line-height: 46px;
+    }
+
+    .expand:focus,
+    .expand:hover {
+        color: white;
+    }
+
+    .expand:hover {
+        background: #5a5c69;
+    }
+
+    .expand i {
+        font-weight: 800;
+    }
+
+    .compress {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        display: none;
+        width: 2.75rem;
+        height: 2.75rem;
+        text-align: center;
+        color: #fff;
+        background: rgba(90, 92, 105, 0.5);
+        line-height: 46px;
+    }
+
+    .compress:focus,
+    .compress:hover {
+        color: white;
+    }
+
+    .compress:hover {
+        background: #5a5c69;
+    }
+
+    .compress i {
+        font-weight: 800;
+    }
+
+    .card {
+        position: relative;
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 1px solid #d2d2dc;
+        border-radius: 10px;
+        -webkit-box-shadow: 0px 0px 5px 0px rgb(249, 249, 250);
+        -moz-box-shadow: 0px 0px 5px 0px rgba(212, 182, 212, 1);
+        box-shadow: 0px 0px 5px 0px rgb(161, 163, 164)
+    }
+
+    .card .card-body {
+        padding: 1rem 1rem
+    }
+
+    .card-body {
+        flex: 1 1 auto;
+        padding: 1.25rem
+    }
+
+    .title {
+        font-size: 17px;
+        font-weight: 300;
+        margin-bottom: 17px;
+        color: #000;
+    }
+
+    .description {
+        font-size: 13px;
+        color: #000;
+    }
+
+    .mt-30 {
+        margin-top: 30px
+    }
+
+    .modal {
+        transform: translate(0%, 20%);
+    }
+
+    .progress {
+        height: 25px;
+        background: #eee;
+        border-radius: 20px;
+        overflow: visible;
+        line-height: 15px;
+    }
+
+    .progress .progress-bar {
+        border-radius: 20px;
+        position: relative;
+        animation: animate-positive 2s;
+    }
+
+    .progress .progress-value {
+        position: absolute;
+        top: 1px;
+        right: 0px;
+        left: 0px;
+        font-size: 13px;
+        color: #fff;
+        padding: 3px 7px;
+    }
+
+
+    @-webkit-keyframes animate-positive {
+        0% {
+            width: 0%;
+        }
+    }
+
+    @keyframes  animate-positive {
+        0% {
+            width: 0%;
+        }
+    }
+
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    a {
+        text-decoration: none !important;
+    }
+
+    a:hover {
+        color: #FF8305;
+    }
+
+    .swal2-container {
+        max-width: 480px !important;
+    }
+
+    .btn-primary-brilink{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 8px;
+        background: var(--primary-primary-80, rgba(0, 81, 160, 0.80));
+        /*TEXT*/
+        color: var(--neutral-light-light-10, #F8F9F9);
+    }
+
+    .btn-menu{
+        height: 40px;
+        border-radius: 8px;
+        border: 1px solid #D0D5DD;
+        color: #344054;
+    }
+    .btn-menu-clicked{
+        color: #FFFFFF !important;
+        background-color: #0051A080 !important;
+    }
+    .btn-menu-unclicked{
+        background-color: #FFFFFF !important;
+    }
+
+    .tooltip-inner {
+        background-color: black;
+        color: white;
+        opacity: 1 !important;
+        text-align: left;
+        overflow-y: auto;
+        max-width: 1000px;
+        max-height: 600px;
+        display: block;
+        font-size: 1rem;
+    }
+</style>
+
+<body id="page-top">
+    <div style="display: none;" class="alertflash" data-flashdata-fail=""></div>
+    <!-- Page Wrapper -->
+    <div id="overlay1">
+        <div class="cv-spinner1">
+            <span class="spinner1"></span>
+        </div>
+    </div>
+    <div id="wrapper">
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <!-- Main Content -->
+            <div id="content" style="background: #f1f1f1;">
+                <!-- End of Topbar -->
+                <meta name="csrf-token" content="VlArCSk5ag8i2zj7JG4uTPOC7gdCkbcUEcf2vxfy">
+                    <style>
+        .pdg {
+            padding: 20px;
+        }
+
+        .padding-forms {
+            padding-left: 15px;
+            /* padding-top: 15px; */
+            padding-right: 10px;
+        }
+
+        .card {
+            border-radius: 0.938rem !important;
+        }
+
+        .dot {
+            height: 33px;
+            width: 33px;
+            border-radius: 50%;
+            display: inline-block;
+            color: #ffffff;
+            text-align: center;
+            line-height: 33px;
+        }
+
+        .bg-oranges {
+            background-color: #ecb043 !important;
+        }
+
+        .bg-blues {
+            background-color: #00BFD9 !important;
+        }
+
+        .bg-purples {
+            background-color: #9B51E0 !important;
+        }
+
+        .bg-peachs {
+            background-color: #E8A8B3 !important;
+        }
+
+        .bg-greens {
+            background-color: #27AE60 !important;
+        }
+
+        .bg-maroons {
+            background-color: #DA7480 !important;
+        }
+
+        td[colspan]:not([colspan="1"]) {
+            text-align: center;
+        }
+
+        fieldset {
+            display: block;
+            margin-inline-start: 2px;
+            margin-inline-end: 2px;
+            padding-block-start: 0.35em;
+            padding-inline-start: 0.75em;
+            padding-inline-end: 0.75em;
+            padding-block-end: 0.625em;
+            min-inline-size: min-content;
+            border-width: 2px;
+            border-style: groove;
+            border-color: rgb(192, 192, 192);
+            border-image: initial;
+            color: black;
+            border-radius: 10px;
+        }
+
+        legend {
+            display: block;
+            padding-inline-start: 2px;
+            padding-inline-end: 2px;
+            border-width: initial;
+            border-style: none;
+            border-color: initial;
+            border-image: initial;
+        }
+
+        .bg-merah {
+            background-color: #F55454;
+            color: #FFFFFF;
+            border-radius: 3px;
+        }
+
+        .bg-kuning {
+            background-color: #FFBC1F;
+            color: #FFFFFF;
+            border-radius: 3px;
+        }
+
+        .bg-hijau1 {
+            background-color: #A4EBC2;
+            border-radius: 3px;
+        }
+
+        .bg-hijau2 {
+            background-color: #27AE60;
+            color: #FFFFFF;
+            border-radius: 3px;
+        }
+
+        .dropdown-toggle::after {
+            display: none !important;
+        }
+
+        #select_search1 {
+            width: 200px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+
+            /* Arrow */
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem top 50%;
+            background-size: 0.65rem auto;
+        }
+
+        .buttonexportkanwil:hover {
+            color: white;
+            background-color: #2a5984;
+        }
+
+        .th-sortable {
+            cursor: pointer;
+        }
+    </style>
+    <!-- Begin Page Content -->
+    <div class="container-fluid mt-4">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h4 mb-0 text-black font-weight-bold">Monitoring MPOS <font id="text-brand"></font></h1>
+            <div class="d-none d-sm-inline-block" style="width: 300px">
+                <button type="button" class="btn btn-primary-brilink buttonexportkanwil float-right">
+                    <img style="text-align: left" src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/img/svg/icon_download.svg"> &nbsp; Export Data</button>
+            </div>
+        </div>
+        <br>
+        <div class="card h-100 animate__animated animate__fadeIn" style="border: none; box-shadow: none;">
+            <div class="card-body row" style="padding: 2rem 2rem;">
+                <div class="col-sm-12 col-12">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="information-box" style="background-color: #FFFFFF; border: none !important; padding: 0; margin-bottom: 24px;">
+                                <div class="row">
+                                                                                                                <div class="col-md-7">
+                                        </div>
+                                                                        <div class="col-md-5">
+	<div style="width: 100%; display: flex; felx-warp: wrap;">
+		<div class="input-group mb-3">
+			<div class="input-group-prepend">
+				<select name="" id="select_search1" class="form-control" style="border-top-right-radius: 0px; border-bottom-right-radius: 0px;">
+					<option value=""> Cari Berdasarkan </option>
+					<option value="brilink_web_code"> Brilink Web Code </option>
+					<option value="brilink_web_name"> Brilink Web Name </option>
+					<option value="outlet_code"> Outlet Code </option>
+					<option value="outlet_name"> Outlet Name </option>
+					<option value="sn"> Serial Number </option>
+				</select>
+			</div>
+			<input type="text" class="form-control" placeholder="Search" readonly
+						style="border-top-right-radius: 0.35rem; border-bottom-right-radius: 0.35rem; font-weight: 500;" id="input_search1" />
+			<button class="btn btn-primary rounded-0" id="button_search1"
+				style="display: none">Submit</button>
+		</div>
+		&nbsp;
+		<div class="dropdown">
+			<button
+				class="btn btn-menu dropdown-toggle"
+				type="button" id="dropdownMenuButton"
+				data-toggle="dropdown" aria-haspopup="true"
+				aria-expanded="false"> <img
+					src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/img/filter-img.png">&nbsp;
+				<b>Filter</b>
+			</button>
+			<div class="dropdown-menu dropdown-menu-right"
+				aria-labelledby="dropdownMenuButton"
+				id="dropdown_channel">
+				<div class="dropdown-item" style="pointer-events: none;"><h5><b>Filter</b></h5></div>
+				<div class="dropdown-item" style="pointer-events: none;">Cari berdasarkan Merek</div>
+				<div class="dropdown-divider"></div>
+				<label class="dropdown-item radio-merek" style="cursor:pointer;">
+					<input type="radio" name="pilih_merek" data-name="" value="semua" checked>
+					&nbsp;Semua				</label>
+									<label class="dropdown-item radio-merek" style="cursor:pointer;">
+						<input type="radio" name="pilih_merek" data-name="Verifone" value="verifone" >
+						&nbsp;Verifone					</label>
+									<label class="dropdown-item radio-merek" style="cursor:pointer;">
+						<input type="radio" name="pilih_merek" data-name="Sunmi" value="sunmi" >
+						&nbsp;Sunmi					</label>
+									<label class="dropdown-item radio-merek" style="cursor:pointer;">
+						<input type="radio" name="pilih_merek" data-name="Pax" value="pax" >
+						&nbsp;Pax					</label>
+									<label class="dropdown-item radio-merek" style="cursor:pointer;">
+						<input type="radio" name="pilih_merek" data-name="Ingenico" value="ingenico" >
+						&nbsp;Ingenico					</label>
+									<label class="dropdown-item radio-merek" style="cursor:pointer;">
+						<input type="radio" name="pilih_merek" data-name="Newpos" value="newpos" >
+						&nbsp;Newpos					</label>
+									<label class="dropdown-item radio-merek" style="cursor:pointer;">
+						<input type="radio" name="pilih_merek" data-name="Other" value="other" >
+						&nbsp;Other					</label>
+							</div>
+		</div>
+	</div>
+</div>                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="table-responsive">
+                        <table class="table table-striped w-100 m-0" id="tableMonitoring" width="100%" cellspacing="0" style="border-collapse: collapse; border-radius: 0.938rem !important; overflow: hidden;">
+                            <thead style="background-color: #0051A0E5 !important;color: white;">
+                                <tr class="head_border_left">
+                                    <th rowspan="2" class="align-middle text-center th-sortable"
+                                        style="border-left: 0px !important; border-color: white;" data-column="region_name" data-order="desc">Kanwil &#9650</th>
+                                    <th rowspan="2" class="align-middle text-center th-sortable"
+                                        style="border-left: 1; border-color: white;" data-column="total_outlet" data-order="desc">Total Outlet &#9650</th>
+                                    <th rowspan="2" class="align-middle text-center th-sortable"
+                                        style="border-left: 1; border-color: white;" data-column="activation_not_perfect" data-order="desc">Belum Aktivasi &#9650</th>
+                                    <th colspan="8" class="text-center" style="border-bottom: 2px solid #e3e6f0 !important;">
+                                        <div class="text-last">
+                                            Last Login                                        </div>
+                                    </th>
+                                </tr>
+                                <tr class="head_border_left">
+                                    <th class="align-middle text-center th-sortable" data-column="today" data-order="desc">Today  &#9650</th>
+                                    <th class="align-middle text-center th-sortable" data-column="satu" data-order="desc">01 - 07  &#9650</th>
+                                    <th class="align-middle text-center th-sortable" data-column="delapan" data-order="desc">08 - 15  &#9650</th>
+                                    <th class="align-middle text-center th-sortable" data-column="enambelas" data-order="desc">16 - 30  &#9650</th>
+                                    <th class="align-middle text-center th-sortable" data-column="last30" data-order="desc">> 30  &#9650</th>
+                                    <th class="align-middle text-center th-sortable" data-column="activation_perfect" data-order="desc">Telah Aktivasi  &#9650</th>
+                                    <th class="align-middle text-center th-sortable" data-column="avail" data-order="desc"><a data-bs-toggle="tooltip" title="((Today + (01-07) + (8-15) + (16-30)) / Telah Aktivasi ) * 100">Avail(%) &#9650</a></th>
+                                    <th class="align-middle text-center th-sortable" data-column="relia" data-order="desc"><a data-bs-toggle="tooltip" title="((Today + (01-07)) / Telah Aktivasi ) * 100">Relia(%) &#9650</a></th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-black" id="body_tableMonitoring">
+                                <tr>
+                                    <td colspan="11"><i class="fas fa-spin fa-spinner"></i> Loading data...</td>
+                                </tr>
+                            </tbody>
+                            <tfoot style="background-color: #0051A0E5 !important;color: white;" id="foot_tableMonitoring">
+                                <tr>
+                                    <td colspan="11"><i class="fas fa-spin fa-spinner"></i> Loading data...</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card h-100 animate__animated animate__fadeIn" style="margin-top: 24px; margin-bottom: 24px; border: none !important; box-shadow: none;">
+            <div class="card-body row" style="padding: 2rem 2rem;">
+                <div class="col-sm-12 col-12">
+                    <h4 style="color: #000000"><b>Information</b></h4>
+                    <ul>
+                        <li style="color: #000000">
+                            Data Aktivasi MPOS berasal dari Data BRILink
+                        </li>
+                        <li style="color: #000000">
+                            Data Implementasi MPOS berasal dari Dashboard BSS (BRILink Support System)
+                        </li>
+                        <li style="color: #000000">
+                            Avail(%) : (Today + 01-07 + 08-15 + 16-30 / telah aktivasi) * 100<br>
+                            Relia(%) : (Today + 01-07 / telah aktivasi) * 100<br>
+                        </li>
+                        <br>
+                        <li style="color: #000000">AVAILABILITY:
+                            <label class="bg-merah">&nbsp;&nbsp;&lt; 60%&nbsp;</label>&nbsp;
+                            <label class="bg-kuning">&nbsp;&nbsp;60 - 70%&nbsp;</label>&nbsp;
+                            <label class="bg-hijau1">&nbsp;&nbsp;70 - 80%&nbsp;</label>&nbsp;
+                            <label class="bg-hijau2">&nbsp;&nbsp;&gt; 80%&nbsp;</label><br>
+                            <br>
+                        </li>
+                        <li style="color: #000000">RELIABILITY :
+                            <label class="bg-merah">&nbsp;&nbsp;<u>&lt;</u> 70%&nbsp;</label>&nbsp;
+                            <label class="bg-kuning">&nbsp;&nbsp;70 - 85%&nbsp;</label>&nbsp;
+                            <label class="bg-hijau2">&nbsp;&nbsp;<u>&gt;</u> 85%&nbsp;</label><br>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End of Content Wrapper -->
+            </div>
+            <!-- End of Main Content -->
+        </div>
+        <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="refresh rounded" style="display: none;" id="refreshredis" href="javascript:void(0)">
+        &#x21bb;
+    </a>
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+    <a class="expand rounded" id="openfull" onclick="openFullscreen()" href="javascript:void(0)">
+        <i class="fas fa-expand"></i>
+    </a>
+    <a class="compress rounded" id="exitfull" onclick="closeFullscreen()" href="javascript:void(0)">
+        <i class="fas fa-compress"></i>
+    </a>
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Yakin ingin keluar?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Pilih "Keluar" jika anda ingin keluar dari aplikasi.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
+                    <a class="btn btn-primary" href="https://brilinkbos.bri.co.id/brilink-bos/public/logout">Keluar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="JobModal" tabindex="-1" role="dialog" aria-labelledby="JobModalLabel"
+        aria-hidden="true" style="border-radius: 17px;">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+            <div class="modal-content" style="border-radius: 17px;">
+                <div class="card"
+                    style="border-radius: 17px;width: 100%;min-height: 200px;max-height: 450px;overflow: auto;">
+                    <div class="card-body">
+                        <div class="modal-body">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            
+                            <table class="table mb-0" style="width: 100%" id="heartbeattambah">
+
+                            </table>
+                            <table class="table mb-0" style="width: 100%" id="ActivationTable">
+                                <tr>
+                                    <td style="width: 50%" valign="center">Activation</td>
+                                    <td style="width: 50%">
+                                        <button class="btn btn-sm btn-primary start_job start_job_activation"
+                                            data-bagian="activation"
+                                            style="border-radius: 0 !important;">Start</button>
+                                        <button class="btn btn-sm btn-success refresh_job"
+                                            style="border-radius: 0 !important;"
+                                            data-job_type="activation">Refresh</button>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table mb-0" style="width: 100%" id="activationtambah">
+
+                            </table>
+                            <table class="table mb-0" style="width: 100%" id="ImplementationTable">
+                                <tr>
+                                    <td style="width: 50%" valign="center">Implementation</td>
+                                    <td style="width: 50%">
+                                        <button class="btn btn-sm btn-primary start_job start_job_implementation"
+                                            data-bagian="implementation"
+                                            style="border-radius: 0 !important;">Start</button>
+                                        <button class="btn btn-sm btn-success refresh_job"
+                                            style="border-radius: 0 !important;"
+                                            data-job_type="implementation">Refresh</button>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table mb-0" style="width: 100%" id="implementationtambah">
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<!-- Bootstrap core JavaScript-->
+<script src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/vendor/jquery/jquery.min.js?v=218"></script>
+<script src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/vendor/bootstrap/js/bootstrap.bundle.min.js?v=218"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/vendor/jquery-easing/jquery.easing.min.js?v=218"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/js/sb-admin-2.js?v=218"></script>
+<script src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/js/nprogress.js?v=218"></script>
+<script src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/js/sweetalert.min.js?v=218"></script>
+<script src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/vendor/ladda/spin.js?v=218"></script>
+<script src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/vendor/ladda/ladda.js?v=218"></script>
+<script src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/js/main.js?v=218"></script>
+<!-- Bootstrap Notify -->
+<script src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/temp/js/bootstrap-notify.min.js?v=218"></script>
+<script>
+    var alertfail = $('.alertflash').data('flashdata-fail');
+
+    var toastMixin = Swal.mixin({
+        toast: true,
+        icon: 'success',
+        title: 'General Title',
+        animation: true,
+        position: 'top-right',
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true,
+    });
+
+    if (alertfail) {
+        toastMixin.fire({
+            title: alertfail,
+            icon: 'error'
+        });
+    }
+
+    NProgress.start();
+
+    // Increase randomly
+    var interval = setInterval(function() {
+        NProgress.inc();
+    }, 1000);
+
+    // Trigger finish when page fully loaded
+    $(window).on('load', function() {
+        clearInterval(interval);
+        NProgress.done();
+    });
+
+    // Trigger bar when exiting the page
+    $(window).on('unload', function() {
+        NProgress.start();
+    });
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            event.preventDefault();
+            return false;
+        }
+
+        return true;
+    }
+
+    function isNotSymbol(event) {
+        var regex = new RegExp("^[a-zA-Z0-9@()& ]*$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+    }
+
+    var counter = 0;
+
+    $('#select_search').change(function() {
+        var select = $(this).val();
+        $('#input_search').val("");
+        $('#input_search').removeClass('is-invalid', true);
+        $('#input_search').removeClass('is-valid', true);
+        if (select == "outlet_code" || select == "brilink_web_code") {
+            $('#input_search').attr('onkeypress', 'return isNumberKey(event)');
+        } else {
+            $('#input_search').attr('onkeypress', 'return isNotSymbol(event)');
+        }
+        if (select != "") {
+            $('#input_search').show();
+            $('#button_search').show();
+            $('#input_search').focus();
+            $('#bagian1').removeClass('col-md-3', true);
+            $('#bagian1').addClass('col-md-1', true);
+            $('#bagian2').removeClass('col-md-4', true);
+            $('#bagian2').addClass('col-md-6', true);
+            $('#bagian2').addClass('animate__animated', true);
+            $('#bagian2').addClass('animate__fadeIn', true);
+        } else {
+            $('#button_search').hide();
+            $('#input_search').hide();
+            $('#bagian1').removeClass('col-md-1', true);
+            $('#bagian1').addClass('col-md-3', true);
+            $('#bagian2').removeClass('col-md-6', true);
+            $('#bagian2').addClass('col-md-4', true);
+        }
+    })
+
+    $("#input_search").keyup(function(event) {
+        if (event.keyCode === 13) {
+            $("#button_search").click();
+        }
+    })
+
+    $('#button_search').click(function() {
+        var input = $('#input_search').val();
+        var select = $('#select_search').val();
+
+        if (input == "") {
+            $('#input_search').addClass('is-invalid', true);
+        } else {
+            if (select == "brilink_web_name" || select == "outlet_name") {
+                if (input.length < 5) {
+                    toastMixin.fire({
+                        title: "Maaf, input minimal 5 karakter !",
+                        icon: "error",
+                    });
+                    return false;
+                }
+                true;
+            }
+            $('#input_search').removeClass('is-invalid', true);
+
+            $.ajax({
+                url: url + "/monitoring/SearchMerchant",
+                type: "POST",
+                dataType: "json",
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                    "Content-Type": "application/json",
+                },
+                data: {
+                    key: select,
+                    value: input
+                },
+                success: function(response) {
+                    if (response.response_code != "00") {
+                        toastMixin.fire({
+                            title: "Data yang kamu cari tidak ditemukan!",
+                            icon: "error",
+                        });
+                    } else {
+                        window.location.href =
+                            "https://brilinkbos.bri.co.id/brilink-bos/public/monitoring/PageSearchMerchant";
+                    }
+                },
+                error: function(response) {
+                    // toastMixin.fire({
+                    //     title: "Data yang kamu cari tidak ditemukan!",
+                    //     icon: "error",
+                    // });
+                    toastMixin.fire({
+                        title: "Mohon maaf sepertinya ada kesalahan pada sistem kami.",
+                        icon: "error",
+                    })
+                    .then((response) => {
+                        location.reload();
+                    })
+                    .catch((e) => console.log(e));
+                },
+            });
+        }
+    })
+
+    $('#select_search1').change(function () {
+        var value = $(this).val();
+        if (value == "") {
+            $('#input_search1').attr('readonly', true);
+        }else{
+            $('#input_search1').attr('readonly', false);
+        }
+    })
+
+    $("#input_search1").keyup(function(event) {
+        if (event.keyCode === 13) {
+            getDataSearch()
+        }
+    })
+
+    function getDataSearch(){
+        var input = $('#input_search1').val();
+        var select = $('#select_search1').val();
+
+        if (input == "") {
+            $('#input_search').addClass('is-invalid', true);
+        } else {
+            if (select == "brilink_web_name" || select == "outlet_name") {
+                if (input.length < 5) {
+                    toastMixin.fire({
+                        title: "Maaf, input minimal 5 karakter !",
+                        icon: "error",
+                    });
+                    return false;
+                }
+                true;
+            }
+            $('#input_search').removeClass('is-invalid', true);
+
+            $.ajax({
+                url: url + "/monitoring/SearchMerchant",
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                    "Content-Type": "application/json",
+                },
+                data: {
+                    key: select,
+                    value: input
+                },
+                success: function(response) {
+                    if (response.response_code != "00") {
+                        toastMixin.fire({
+                            title: "Data yang kamu cari tidak ditemukan!",
+                            icon: "error",
+                        });
+                    } else {
+                        window.location.href =
+                            "https://brilinkbos.bri.co.id/brilink-bos/public/monitoring/PageSearchMerchant";
+                    }
+                },
+                error: function(response) {
+                    toastMixin.fire({
+                        title: "Data yang kamu cari tidak ditemukan!",
+                        icon: "error",
+                    });
+                },
+            });
+        }
+    }
+
+    var elem = document.documentElement;
+
+    function openFullscreen() {
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            /* Firefox */
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+            /* Chrome, Safari & Opera */
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            /* IE/Edge */
+            elem.msRequestFullscreen();
+        }
+        document.getElementById("openfull").style.display = "none";
+        document.getElementById("exitfull").style.display = "block";
+    }
+
+    function closeFullscreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+        document.getElementById("openfull").style.display = "block";
+        document.getElementById("exitfull").style.display = "none";
+    }
+
+    function active_tooltip(placement = "left") {
+        let tooltipTimer = false;
+        let isTooltipOpen = false;
+        let tooltipDelay = 100;
+
+        $(document).on('mouseover', '[data-bs-toggle=tooltip]', function(e) {
+            $('.tooltip').tooltip('hide');
+
+            $(e.currentTarget).tooltip({
+                'trigger': 'manual',
+                'html': true,
+                'placement': placement
+            }).tooltip('show');
+        });
+
+        $(document).on('mouseleave', '[data-bs-toggle=tooltip]', function(e) {
+            if (!isTooltipOpen) {
+                tooltipTimer = setTimeout(function () {
+                $(e.currentTarget).tooltip('hide');
+                }, tooltipDelay);
+            }
+        });
+
+        $(document).on('mouseover', '.tooltip', function() {
+            clearTooltipTimeout();
+
+            isTooltipOpen = true;
+        });
+
+        $(document).on('mouseleave', '.tooltip', function(e) {
+            tooltipTimer = setTimeout(function () {
+                $(e.currentTarget).tooltip('hide');
+            }, tooltipDelay);
+
+            isTooltipOpen = false;
+        });
+
+        function clearTooltipTimeout()
+        {
+            if (tooltipTimer)
+            {
+                window.clearTimeout(tooltipTimer);
+
+                tooltipTimer = false;
+            }
+        }
+    }
+</script>
+    <script>
+        const url = "https://brilinkbos.bri.co.id/brilink-bos/public";
+        const pagination = 10;
+    </script>
+    <script src="https://brilinkbos.bri.co.id/brilink-bos/public/assets-mpos/js-monitoring/list_kanwil.js?v=218"></script>
+    <script>
+        $(document).ready(function() {
+            $('.buttonexportkanwil').on('click', function() {
+                window.location.href = "https://brilinkbos.bri.co.id/brilink-bos/public/monitoring/export_kanwil";
+            })
+            active_tooltip("top");
+        })
+
+        function data_not_found(response) {
+            $("#region_name").html("-");
+            $("#branch_name").html("-");
+            if (response) {
+                if (response.response_code == "DN") {
+                    list_table = `<tr><td colspan="11" style="text-align=center;">Data Kosong</td></tr>`;
+                } else {
+                    list_table =
+                        `<tr><td colspan="11" style="text-align=center;">Terdapat kendala dalam service kami, Silakan coba beberapa saat lagi.</td></tr>`;
+                }
+            } else {
+                list_table =
+                    `<tr><td colspan="11" style="text-align=center;">Terdapat kendala dalam service kami, Silakan coba beberapa saat lagi.</td></tr>`;
+            }
+            $("#tableMonitoring tbody tr").remove();
+            $('#tableMonitoring > tbody:first').html(list_table);
+            $("#tableMonitoring tfoot tr").remove();
+            $('#tableMonitoring > tfoot:first').html(`<tr class="head_border_left">
+                                        <th class="text-center">Total</th>
+                                        <th class="text-center">-</th>
+                                        <th class="text-center">-</th>
+                                        <th class="text-center">-</th>
+                                        <th class="text-center">-</th>
+                                        <th class="text-center">-</th>
+                                        <th class="text-center">-</th>
+                                        <th class="text-center">-</th>
+                                        <th class="text-center">-</th>
+                                        <th class="text-center">-</th>
+                                        <th class="text-center">-</th>
+                                    </tr>`);
+        }
+
+        const uri_segment = "";
+        if (uri_segment != "" && uri_segment != "kanca" && uri_segment != "unit") {
+            document.getElementById("refreshredis").style.display = "none";
+            $('#lihat_jobs').attr('style','right: 5rem;')
+        }else{
+            document.getElementById("refreshredis").style.display = "block";
+            $('#lihat_jobs').attr('style','right: 9rem;')
+        }
+
+        $('#refreshredis').on('click', function () {
+            $.ajax({
+                url: url + "/monitoring/refreshredis",
+                type: 'GET',
+                dataType: "json",
+                data: {
+                    redis_type: "kanwil",
+                    redis_key: 0
+                },
+                success: function(response) {
+                    location.reload();
+                }
+            });
+        });
+
+        // $(document).on('click', '.dropdown-menu', function (e) {
+        //     e.stopPropagation();
+        // });
+
+        $(function(){
+            if($(this).attr('checked') == true) {
+                $('.radio-merek').not(this).attr('checked',false);
+            }
+        });
+    </script>
+
+</html>
