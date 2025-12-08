@@ -1,9 +1,7 @@
 <?php
 // ==========================
-// 
+// KONEKSI DATABASE
 // ==========================
-
-// Koneksi database
 $host = "localhost";
 $user = "root";
 $pass = "";
@@ -14,7 +12,9 @@ if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);
 }
 
-// Ambil data merchant tidak aktif ≥ 8 hari
+// ==========================
+// AMBIL MERCHANT NOP ≥ 8 HARI
+// ==========================
 $sql = "
     SELECT MID, TID, Nama_Merchant, Vendor, Last_Availability
     FROM wpe
@@ -25,7 +25,9 @@ $sql = "
 ";
 $result = $conn->query($sql);
 
-// Insert log baru jika belum ada
+// ==========================
+// INSERT KE LOG JIKA BELUM ADA
+// ==========================
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $MID  = $conn->real_escape_string($row['MID']);
@@ -34,7 +36,6 @@ if ($result && $result->num_rows > 0) {
         $Vendor = $conn->real_escape_string($row['Vendor']);
         $Last_Lama = $conn->real_escape_string($row['Last_Availability']);
 
-        // Cek apakah log sudah ada
         $cekInsert = $conn->query("
             SELECT id FROM nop_merchant_log
             WHERE TID='$TID'
@@ -51,7 +52,9 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
-// Otomatis update Tanggal_Aktif jika merchant aktif lagi
+// ==========================
+// UPDATE JIKA MERCHANT AKTIF LAGI
+// ==========================
 $logs = $conn->query("
     SELECT id, TID, Last_Availability 
     FROM nop_merchant_log 
@@ -78,16 +81,31 @@ if ($logs && $logs->num_rows > 0) {
     }
 }
 
-// Refresh query
+// REFRESH QUERY UTAMA
 $result = $conn->query($sql);
+
+// ==========================
+// REKAP JUMLAH NOP
+// ==========================
+$rekapNOP = $conn->query("
+    SELECT 
+        MID,
+        TID,
+        Nama_Merchant,
+        Vendor,
+        COUNT(*) AS Jumlah_NOP
+    FROM nop_merchant_log
+    GROUP BY MID, TID, Nama_Merchant, Vendor
+    HAVING COUNT(*) > 1
+    ORDER BY Jumlah_NOP DESC
+");
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
-    <title>Merchant NOP Terbaru</title>
+    <title>Merchant NOP</title>
 
     <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -130,73 +148,107 @@ $result = $conn->query($sql);
             color: #dc3545;
             font-weight: bold;
         }
+
+        .content-wrapper {
+            margin-left: 260px;
+            padding: 20px;
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <h2>Merchant NOP </h2>
+<!-- ✅ SIDEBAR DIPANGGIL DI SINI -->
+<?php include 'sidebaruser.php'; ?>
 
-        <div class="card p-3">
-            <div class="table-responsive">
-                <table id="dataTable" class="table table-striped table-hover table-bordered">
-                    <thead>
-                        <tr>
-                            <th>MID</th>
-                            <th>TID</th>
-                            <th>Nama Merchant</th>
-                            <th>Vendor</th>
-                            <th>Last Availability</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ($result && $result->num_rows > 0): ?>
-                            <?php while ($row = $result->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($row['MID']) ?></td>
-                                    <td><?= htmlspecialchars($row['TID']) ?></td>
-                                    <td><?= htmlspecialchars($row['Nama_Merchant']) ?></td>
-                                    <td><?= htmlspecialchars($row['Vendor']) ?></td>
-                                    <td class="highlight-red"><?= htmlspecialchars($row['Last_Availability']) ?></td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
+<div class="content-wrapper">
+
+    <!-- ========================= -->
+    <!-- TABEL 1 : MERCHANT NOP -->
+    <!-- ========================= -->
+    <h2>NOP Terbaru</h2>
+
+    <div class="card p-3">
+        <div class="table-responsive">
+            <table id="dataTable" class="table table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>MID</th>
+                        <th>TID</th>
+                        <th>Nama Merchant</th>
+                        <th>Vendor</th>
+                        <th>Last Availability</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($result && $result->num_rows > 0): ?>
+                        <?php while ($row = $result->fetch_assoc()): ?>
                             <tr>
-                                <td colspan="5">Tidak ada data</td>
+                                <td><?= htmlspecialchars($row['MID']) ?></td>
+                                <td><?= htmlspecialchars($row['TID']) ?></td>
+                                <td><?= htmlspecialchars($row['Nama_Merchant']) ?></td>
+                                <td><?= htmlspecialchars($row['Vendor']) ?></td>
+                                <td class="highlight-red"><?= htmlspecialchars($row['Last_Availability']) ?></td>
                             </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">Tidak ada data</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <script>
-        $(document).ready(function() {
-            $('#dataTable').DataTable({
-                "pageLength": 10,
-                "lengthMenu": [10, 25, 50, 100],
-                "order": [
-                    [4, "asc"]
-                ],
-                "language": {
-                    "search": "Cari:",
-                    "lengthMenu": "Tampilkan _MENU_ baris",
-                    "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ baris",
-                    "infoEmpty": "Tidak ada data",
-                    "zeroRecords": "Data tidak ditemukan",
-                    "paginate": {
-                        "first": "Pertama",
-                        "last": "Terakhir",
-                        "next": "Berikut",
-                        "previous": "Sebelumnya"
-                    }
-                }
-            });
-        });
-    </script>
+    <br><br>
+
+    <!-- ========================= -->
+    <!-- TABEL 2 : REKAP JUMLAH NOP -->
+    <!-- ========================= -->
+    <h2>NOP Berulang</h2>
+
+    <div class="card p-3">
+        <div class="table-responsive">
+            <table id="dataTableRekap" class="table table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>MID</th>
+                        <th>TID</th>
+                        <th>Nama Merchant</th>
+                        <th>Vendor</th>
+                        <th>Jumlah NOP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($rekapNOP && $rekapNOP->num_rows > 0): ?>
+                        <?php while ($row = $rekapNOP->fetch_assoc()): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($row['MID']) ?></td>
+                                <td><?= htmlspecialchars($row['TID']) ?></td>
+                                <td><?= htmlspecialchars($row['Nama_Merchant']) ?></td>
+                                <td><?= htmlspecialchars($row['Vendor']) ?></td>
+                                <td class="highlight-red"><?= $row['Jumlah_NOP'] ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">Tidak ada data</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#dataTable').DataTable();
+    $('#dataTableRekap').DataTable();
+});
+</script>
 
 </body>
-
 </html>

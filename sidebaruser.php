@@ -181,7 +181,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     <li><a href="notfound.php" class="nav-link">Reliability FMS</a></li>
                     <li><a href="notfound.php" class="nav-link">Time Series</a></li>
                     <li><a href="vendor.php" class="nav-link">Group Vendor</a></li>
-                    <li><a href="notfound.php" class="nav-link">NOP Berulang</a></li>
+                    <li><a href="nop_merchant.php" class="nav-link">NOP Berulang</a></li>
                     <a href="map_mesin.php" class="nav-link" title="Tracking EDC"><i class="fas fa-search"></i><span>Peta Mesin</span></a>
                 </ul>
             </li>
