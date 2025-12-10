@@ -2,12 +2,47 @@
 include 'koneksi.php';
 $msg = "";
 
-// =================== HANDLE AJAX DONE ===================
+// =================== HANDLE AJAX DONE (FIX + SINKRON STOK & SIM) ===================
 if (isset($_POST['done_id'])) {
     $done_id = (int)$_POST['done_id'];
+
+    // ✅ 1. SET DONE DI MPOS
     $stmt = $conn->prepare("UPDATE mpos SET status_done=1, notif_user=0 WHERE id=?");
     $stmt->bind_param("i", $done_id);
+
     if ($stmt->execute()) {
+
+        // ✅ 2. AMBIL DATA MESIN, SIM & PENGAJUAN
+        $q = $conn->prepare("SELECT sn_mesin, sn_simcard, pengajuan FROM mpos WHERE id=?");
+        $q->bind_param("i", $done_id);
+        $q->execute();
+        $data = $q->get_result()->fetch_assoc();
+
+        if ($data) {
+            $sn_mesin   = $data['sn_mesin'];
+            $sn_simcard = $data['sn_simcard'];
+            $pengajuan  = strtoupper(trim($data['pengajuan']));
+
+            // ✅ 3. TENTUKAN STATUS BARU
+            if ($pengajuan === 'RETURN') {
+                $status_stok = 'tersedia';
+                $status_sim  = 'tersedia';
+            } else {
+                $status_stok = 'terpakai';
+                $status_sim  = 'terpakai';
+            }
+
+            // ✅ 4. UPDATE EDC STOK
+            $up1 = $conn->prepare("UPDATE edc_stok SET status=? WHERE sn_mesin=?");
+            $up1->bind_param("ss", $status_stok, $sn_mesin);
+            $up1->execute();
+
+            // ✅ 5. UPDATE SIM CARD
+            $up2 = $conn->prepare("UPDATE sim_card SET status=? WHERE sn_simcard=?");
+            $up2->bind_param("ss", $status_sim, $sn_simcard);
+            $up2->execute();
+        }
+
         echo "success";
         exit;
     } else {
@@ -241,12 +276,11 @@ $result = $conn->query("SELECT * FROM mpos ORDER BY id DESC LIMIT $limit OFFSET 
             <li class="nav-item">
                 <a href="#" class="nav-link" data-toggle="submenu" data-target="merchantMenu" data-arrow="merchantArrow"><i class="fas fa-store"></i> Merchant <i class="fas fa-angle-left right ms-auto" id="merchantArrow"></i></a>
                 <ul class="submenu" id="merchantMenu">
-                    <li><a href="wpe_admin.php" class="nav-link">Reliability</a></li>
-                    <li><a href="produk_mpos.php" class="nav-link">Produktifitas</a></li>
+                    <li><a href="#" class="nav-link">Reliability</a></li>
+                    <li><a href="#" class="nav-link">Produktifitas</a></li>
                     <li><a href="#" class="nav-link">NOP Berulang</a></li>
                 </ul>
             </li>
-            
             <li class="nav-item">
                 <a href="#" class="nav-link" data-toggle="submenu" data-target="brilinkMenu" data-arrow="brilinkArrow"><i class="fas fa-link"></i> BRILink <i class="fas fa-angle-left right ms-auto" id="brilinkArrow"></i></a>
                 <ul class="submenu" id="brilinkMenu">

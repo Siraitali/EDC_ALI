@@ -124,24 +124,27 @@ $rekapNOP = $conn->query("
 
         h2 {
             text-align: center;
-            margin: 30px 0;
+            margin: 10px 0; /* lebih rapat */
             color: #dc3545;
             font-weight: 600;
         }
 
         .card {
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px; /* rapat antar card */
         }
 
         table.dataTable thead th {
             background-color: #dc3545;
             color: white;
             text-align: center;
+            white-space: nowrap;
         }
 
         table.dataTable tbody td {
             text-align: center;
+            vertical-align: middle;
         }
 
         .highlight-red {
@@ -149,28 +152,43 @@ $rekapNOP = $conn->query("
             font-weight: bold;
         }
 
-        .content-wrapper {
-            margin-left: 260px;
-            padding: 20px;
+        /* MAIN CONTENT SMOOTH ANIMATION */
+        .main-content {
+            margin-left: 250px;
+            padding: 15px; 
+            width: calc(100% - 250px);
+            transition: all 0.5s ease;
+            margin-top: 20px; /* lebih dekat ke toolbar */
+        }
+
+        body.sidebar-collapsed .main-content {
+            margin-left: 70px;
+            width: calc(100% - 70px);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            transition: all 0.5s ease;
+        }
+
+        table {
+            width: 100% !important;
         }
     </style>
 </head>
-
 <body>
 
-<!-- ✅ SIDEBAR DIPANGGIL DI SINI -->
+<!-- PANGGIL SIDEBAR -->
 <?php include 'sidebaruser.php'; ?>
 
-<div class="content-wrapper">
+<!-- KONTEN UTAMA -->
+<div class="main-content">
 
-    <!-- ========================= -->
-    <!-- TABEL 1 : MERCHANT NOP -->
-    <!-- ========================= -->
     <h2>NOP Terbaru</h2>
-
-    <div class="card p-3">
+    <div class="card p-2">
         <div class="table-responsive">
-            <table id="dataTable" class="table table-striped table-hover table-bordered">
+            <table id="dataTable" class="table table-striped table-hover table-bordered w-100">
                 <thead>
                     <tr>
                         <th>MID</th>
@@ -181,36 +199,28 @@ $rekapNOP = $conn->query("
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($result && $result->num_rows > 0): ?>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($row['MID']) ?></td>
-                                <td><?= htmlspecialchars($row['TID']) ?></td>
-                                <td><?= htmlspecialchars($row['Nama_Merchant']) ?></td>
-                                <td><?= htmlspecialchars($row['Vendor']) ?></td>
-                                <td class="highlight-red"><?= htmlspecialchars($row['Last_Availability']) ?></td>
-                            </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
+                <?php if ($result && $result->num_rows > 0): ?>
+                    <?php while ($row = $result->fetch_assoc()): ?>
                         <tr>
-                            <td colspan="5">Tidak ada data</td>
+                            <td><?= htmlspecialchars($row['MID']) ?></td>
+                            <td><?= htmlspecialchars($row['TID']) ?></td>
+                            <td><?= htmlspecialchars($row['Nama_Merchant']) ?></td>
+                            <td><?= htmlspecialchars($row['Vendor']) ?></td>
+                            <td class="highlight-red"><?= htmlspecialchars($row['Last_Availability']) ?></td>
                         </tr>
-                    <?php endif; ?>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr><td colspan="5">Tidak ada data</td></tr>
+                <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <br><br>
-
-    <!-- ========================= -->
-    <!-- TABEL 2 : REKAP JUMLAH NOP -->
-    <!-- ========================= -->
     <h2>NOP Berulang</h2>
-
-    <div class="card p-3">
+    <div class="card p-2">
         <div class="table-responsive">
-            <table id="dataTableRekap" class="table table-striped table-hover table-bordered">
+            <table id="dataTableRekap" class="table table-striped table-hover table-bordered w-100">
                 <thead>
                     <tr>
                         <th>MID</th>
@@ -221,21 +231,21 @@ $rekapNOP = $conn->query("
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($rekapNOP && $rekapNOP->num_rows > 0): ?>
-                        <?php while ($row = $rekapNOP->fetch_assoc()): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($row['MID']) ?></td>
-                                <td><?= htmlspecialchars($row['TID']) ?></td>
-                                <td><?= htmlspecialchars($row['Nama_Merchant']) ?></td>
-                                <td><?= htmlspecialchars($row['Vendor']) ?></td>
-                                <td class="highlight-red"><?= $row['Jumlah_NOP'] ?></td>
-                            </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
+                <?php if ($rekapNOP && $rekapNOP->num_rows > 0): ?>
+                    <?php while ($row = $rekapNOP->fetch_assoc()): ?>
                         <tr>
-                            <td colspan="5">Tidak ada data</td>
+                            <td><?= htmlspecialchars($row['MID']) ?></td>
+                            <td><?= htmlspecialchars($row['TID']) ?></td>
+                            <td><?= htmlspecialchars($row['Nama_Merchant']) ?></td>
+                            <td><?= htmlspecialchars($row['Vendor']) ?></td>
+                            <td class="<?= ($row['Jumlah_NOP'] > 1) ? 'highlight-red' : '' ?>">
+                                <?= $row['Jumlah_NOP'] ?>
+                            </td>
                         </tr>
-                    <?php endif; ?>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr><td colspan="5">Tidak ada data</td></tr>
+                <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -244,9 +254,27 @@ $rekapNOP = $conn->query("
 </div>
 
 <script>
-$(document).ready(function() {
-    $('#dataTable').DataTable();
-    $('#dataTableRekap').DataTable();
+$(document).ready(function () {
+
+    var table1 = $('#dataTable').DataTable({ scrollX: true, autoWidth: false });
+    var table2 = $('#dataTableRekap').DataTable({ scrollX: true, autoWidth: false });
+
+    const adjustTables = () => {
+        table1.columns.adjust().draw();
+        table2.columns.adjust().draw();
+    };
+
+    // Smooth resize saat toggle sidebar
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    sidebarToggle.addEventListener('click', function () {
+        setTimeout(adjustTables, 500);
+    });
+
+    // Jika reload dan sidebar collapsed
+    if (localStorage.getItem('sidebar-collapsed') === 'true') {
+        setTimeout(adjustTables, 200);
+    }
+
 });
 </script>
 

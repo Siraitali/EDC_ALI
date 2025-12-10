@@ -296,7 +296,7 @@ $scrap_at    = ($scrapResult && $scrapResult->num_rows > 0) ? $scrapResult->fetc
                     <li><a href="notfound.php" class="nav-link">Reliability FMS</a></li>
                     <li><a href="notfound.php" class="nav-link">Time Series</a></li>
                     <li><a href="vendor.php" class="nav-link">Group Vendor</a></li>
-                    <li><a href="notfound.php" class="nav-link">NOP Berulang</a></li>
+                    <li><a href="nop_merchant.php" class="nav-link">NOP Berulang</a></li>
                     <a href="map_mesin.php" class="nav-link" title="Tracking EDC"><i class="fas fa-search"></i><span>Peta Mesin</span></a>
                 </ul>
             </li>
@@ -310,6 +310,7 @@ $scrap_at    = ($scrapResult && $scrapResult->num_rows > 0) ? $scrapResult->fetc
                     <li><a href="relia_bri.php" class="nav-link <?= $currentPage == 'relia_bri.php' ? 'active' : ''; ?>">Reliability</a></li>
                     <li><a href="produk_bri_user.php" class="nav-link <?= $currentPage == 'produk_bri.php' ? 'active' : ''; ?>">Produktifitas</a></li>
                     <li><a href="notfound.php" class="nav-link">NOP Berulang</a></li>
+                    <li><a href="mpos_user.php" class="nav-link <?= $currentPage == 'mpos_user.php' ? 'active' : ''; ?>">Implementasi MPOS</a></li>
                 </ul>
             </li>
 

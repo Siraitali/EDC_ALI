@@ -30,7 +30,7 @@ if (isset($_POST['import'])) {
                     $branch_code   = $conn->real_escape_string($row[2] ?? '');
                     $branch_office = $conn->real_escape_string($row[3] ?? '');
                     $type_mesin    = $conn->real_escape_string($row[4] ?? '');
-                    $sn_simcard    = $conn->real_escape_string($row[5] ?? '');
+                    $spk    = $conn->real_escape_string($row[5] ?? '');
                     $status_raw    = $row[6] ?? '';
                     $status        = trim($status_raw) === '' ? 'Tersedia' : $conn->real_escape_string($status_raw);
 
@@ -38,15 +38,18 @@ if (isset($_POST['import'])) {
 
                     $qExist = $conn->query("SELECT no FROM edc_stok WHERE sn_mesin = '$sn_mesin' LIMIT 1");
                     if ($qExist && $qExist->num_rows > 0) {
-                        $conn->query("UPDATE edc_stok SET branch_code='$branch_code', branch_office='$branch_office', type_mesin='$type_mesin', sn_simcard='$sn_simcard', status='$status' WHERE sn_mesin = '$sn_mesin'");
+                        $conn->query("UPDATE edc_stok SET branch_code='$branch_code', branch_office='$branch_office', type_mesin='$type_mesin', spk='$spk', status='$status' WHERE sn_mesin = '$sn_mesin'");
                     } else {
-                        $conn->query("INSERT INTO edc_stok (sn_mesin, branch_code, branch_office, type_mesin, sn_simcard, status)
-                                     VALUES ('$sn_mesin','$branch_code','$branch_office','$type_mesin','$sn_simcard','$status')");
+                        $conn->query("INSERT INTO edc_stok (sn_mesin, branch_code, branch_office, type_mesin, spk, status)
+                                     VALUES ('$sn_mesin','$branch_code','$branch_office','$type_mesin','$spk','$status')");
                     }
                 }
-                $msg = "<div class='alert alert-success mt-3'>✅ Import data berhasil!</div>";
+                header("Location: edc_stok.php?msg=success");
+exit;
             } catch (Exception $e) {
-                $msg = "<div class='alert alert-danger mt-3'>❌ Gagal membaca file: " . htmlspecialchars($e->getMessage()) . "</div>";
+                header("Location: edc_stok.php?msg=error&detail=" . urlencode($e->getMessage()));
+exit;
+
             }
         } else {
             $msg = "<div class='alert alert-danger mt-3'>❌ Format file salah atau ukuran melebihi 50MB!</div>";
@@ -407,7 +410,15 @@ while ($r = $qBranch->fetch_assoc()) {
                 </div>
 
                 <div class="card-body">
-                    <?= isset($msg) ? $msg : "" ?>
+                    <?php
+if(isset($_GET['msg'])) {
+    if($_GET['msg'] == 'success'){
+        echo "<div class='alert alert-success mt-3'>✅ Import data berhasil!</div>";
+    } elseif($_GET['msg'] == 'error' && isset($_GET['detail'])){
+        echo "<div class='alert alert-danger mt-3'>❌ Gagal: " . htmlspecialchars($_GET['detail']) . "</div>";
+    }
+}
+?>
 
                     <div class="stat-box">
                         <div class="stat-item">
@@ -447,7 +458,7 @@ while ($r = $qBranch->fetch_assoc()) {
                                     <th>Branch Code</th>
                                     <th>Branch Office</th>
                                     <th>Type Mesin</th>
-                                    <th>SN Simcard</th>
+                                    <th>SPK</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -463,7 +474,7 @@ while ($r = $qBranch->fetch_assoc()) {
                                         <td><?= htmlspecialchars($row['branch_code']) ?></td>
                                         <td><?= htmlspecialchars($row['branch_office']) ?></td>
                                         <td><?= htmlspecialchars($row['type_mesin']) ?></td>
-                                        <td><?= htmlspecialchars($row['sn_simcard']) ?></td>
+                                        <td><?= htmlspecialchars($row['spk']) ?></td>
                                         <td class="text-center">
                                             <span class="status-badge <?= $statusClass ?>"><?= $statusText ?></span>
                                         </td>

@@ -268,6 +268,7 @@ if (isset($_POST['import'])) {
                     <li><a href="produk_bri_admin.php" class="nav-link">Produktifitas</a></li>
                     <li><a href="mpos_admin.php" class="nav-link">Pengajuan MPOS</a></li>
                     <li><a href="#" class="nav-link">NOP Berulang</a></li>
+                    <li><a href="mpos_user.php" class="nav-link <?= $currentPage == 'mpos_user.php' ? 'active' : ''; ?>">Implementasi MPOS</a></li>
                 </ul>
             </li>
 
