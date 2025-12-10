@@ -109,97 +109,96 @@
 
 
 
-        
 
-        // CEK UNIQUE
-       if ($id) {
-    $stmt = $conn->prepare("
+
+            // CEK UNIQUE
+            if ($id) {
+                $stmt = $conn->prepare("
         SELECT * FROM mpos 
         WHERE (outlet_id=? OR sn_mesin=?) 
         AND status_done = 1
         AND id <> ?
     ");
-    $stmt->bind_param("ssi", $outlet_id, $sn_mesin, $id);
-} else {
-    $stmt = $conn->prepare("
+                $stmt->bind_param("ssi", $outlet_id, $sn_mesin, $id);
+            } else {
+                $stmt = $conn->prepare("
         SELECT * FROM mpos 
         WHERE (outlet_id=? OR sn_mesin=?)
         AND status_done = 1
     ");
-    $stmt->bind_param("ss", $outlet_id, $sn_mesin);
-}
-$stmt->execute();
-$res = $stmt->get_result();
+                $stmt->bind_param("ss", $outlet_id, $sn_mesin);
+            }
+            $stmt->execute();
+            $res = $stmt->get_result();
 
-if ($res->num_rows > 0) {
-    $msg = "Outlet ID atau SN Mesin masih AKTIF terpakai!";
-        } else {
-            if ($id) {
-                // EDIT
-                $stmt2 = $conn->prepare("UPDATE mpos SET kc=?, nama_outlet=?, merek_mesin=?, sn_simcard=?, nama_pab=?, outlet_id=?, sn_mesin=?, pengajuan=?, ket_ppbk=? WHERE id=?");
-                $stmt2->bind_param("sssssssssi", $kc, $nama_outlet, $merek_mesin, $sn_simcard, $nama_pab, $outlet_id, $sn_mesin, $pengajuan, $ket_ppbk, $id);
+            if ($res->num_rows > 0) {
+                $msg = "Outlet ID atau SN Mesin masih AKTIF terpakai!";
             } else {
-                // INPUT BARU
-                $stmt2 = $conn->prepare("INSERT INTO mpos
+                if ($id) {
+                    // EDIT
+                    $stmt2 = $conn->prepare("UPDATE mpos SET kc=?, nama_outlet=?, merek_mesin=?, sn_simcard=?, nama_pab=?, outlet_id=?, sn_mesin=?, pengajuan=?, ket_ppbk=? WHERE id=?");
+                    $stmt2->bind_param("sssssssssi", $kc, $nama_outlet, $merek_mesin, $sn_simcard, $nama_pab, $outlet_id, $sn_mesin, $pengajuan, $ket_ppbk, $id);
+                } else {
+                    // INPUT BARU
+                    $stmt2 = $conn->prepare("INSERT INTO mpos
                 (kc,nama_outlet,merek_mesin,sn_simcard,nama_pab,outlet_id,sn_mesin,pengajuan,keterangan,notif_admin,status_done)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?)");
-                $stmt2->bind_param(
-                    "ssssssssiii",
-                    $kc,
-                    $nama_outlet,
-                    $merek_mesin,
-                    $sn_simcard,
-                    $nama_pab,
-                    $outlet_id,
-                    $sn_mesin,
-                    $pengajuan,
-                    $keterangan,
-                    $notif_admin,
-                    $status_done
-                );
+                    $stmt2->bind_param(
+                        "ssssssssiii",
+                        $kc,
+                        $nama_outlet,
+                        $merek_mesin,
+                        $sn_simcard,
+                        $nama_pab,
+                        $outlet_id,
+                        $sn_mesin,
+                        $pengajuan,
+                        $keterangan,
+                        $notif_admin,
+                        $status_done
+                    );
+                }
+
+
+
+                if ($stmt2->execute()) {
+
+                    // ================== SET STATUS ==================
+                    $status_stok = '';
+                    $status_sim  = '';
+
+                    if ($pengajuan == 'IMPLEMENTASI' || $pengajuan == 'REPLACE') {
+                        $status_stok = 'terpakai';
+                        $status_sim  = 'terpakai';
+                    } elseif ($pengajuan == 'RETURN') {
+                        $status_stok = 'tersedia';
+                        $status_sim  = 'tersedia';
+                    }
+
+                    // ================== UPDATE EDC STOK ==================
+                    if ($status_stok != '') {
+                        $stmt3 = $conn->prepare("UPDATE edc_stok SET status=? WHERE sn_mesin=?");
+                        $stmt3->bind_param("ss", $status_stok, $sn_mesin);
+                        $stmt3->execute();
+                    }
+
+                    // ================== UPDATE SIM CARD ==================
+                    if ($status_sim != '') {
+                        $stmtSim = $conn->prepare("UPDATE sim_card SET status=? WHERE sn_simcard=?");
+                        $stmtSim->bind_param("ss", $status_sim, $sn_simcard);
+                        $stmtSim->execute();
+                    }
+
+                    $msg = $id
+                        ? "Data berhasil diupdate & SIM + Stok tersinkron!"
+                        : "Data berhasil disimpan & SIM + Stok tersinkron!";
+                } else {
+                    $msg = "Gagal menyimpan data! Error: " . $stmt2->error;
+                }
             }
-
-           
-
-    if ($stmt2->execute()) {
-
-        // ================== SET STATUS ==================
-        $status_stok = '';
-        $status_sim  = '';
-
-        if ($pengajuan == 'IMPLEMENTASI' || $pengajuan == 'REPLACE') {
-            $status_stok = 'terpakai';
-            $status_sim  = 'terpakai';
-        } elseif ($pengajuan == 'RETURN') {
-            $status_stok = 'tersedia';
-            $status_sim  = 'tersedia';
         }
-
-        // ================== UPDATE EDC STOK ==================
-        if ($status_stok != '') {
-            $stmt3 = $conn->prepare("UPDATE edc_stok SET status=? WHERE sn_mesin=?");
-            $stmt3->bind_param("ss", $status_stok, $sn_mesin);
-            $stmt3->execute();
-        }
-
-        // ================== UPDATE SIM CARD ==================
-        if ($status_sim != '') {
-            $stmtSim = $conn->prepare("UPDATE sim_card SET status=? WHERE sn_simcard=?");
-            $stmtSim->bind_param("ss", $status_sim, $sn_simcard);
-            $stmtSim->execute();
-        }
-
-        $msg = $id
-            ? "Data berhasil diupdate & SIM + Stok tersinkron!"
-            : "Data berhasil disimpan & SIM + Stok tersinkron!";
-
-            } else {
-        $msg = "Gagal menyimpan data! Error: " . $stmt2->error;
     }
-    }
-        }
-        }
-    
+
 
     // =================== DATA UNTUK HALAMAN ===================
     $result = $conn->query("SELECT * FROM mpos ORDER BY id DESC LIMIT $limit OFFSET $offset");
@@ -431,33 +430,33 @@ if ($res->num_rows > 0) {
                     </a>
                 </li>
 
-                <!-- UKO -->
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-toggle="submenu" data-target="ukoMenu" data-arrow="ukoArrow" title="UKO">
-                        <i class="fas fa-user-tie"></i><span>UKO</span><i class="fas fa-angle-left right" id="ukoArrow"></i>
-                    </a>
-                    <ul class="submenu" id="ukoMenu">
-                        <li><a href="relia_uko.php" class="nav-link <?= $currentPage == 'relia_uko.php' ? 'active' : ''; ?>">Reliability</a></li>
-                        <li><a href="produk_uko.php" class="nav-link <?= $currentPage == 'produk_uko.php' ? 'active' : ''; ?>">Produktifitas</a></li>
-                        <li><a href="nop_uko.php" class="nav-link">NOP Berulang</a></li>
-                    </ul>
-                </li>
+                 <!-- UKO -->
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-toggle="submenu" data-target="ukoMenu" data-arrow="ukoArrow" title="UKO">
+                    <i class="fas fa-user-tie"></i><span>UKO</span><i class="fas fa-angle-left right" id="ukoArrow"></i>
+                </a>
+                <ul class="submenu" id="ukoMenu">
+                    <li><a href="relia_uko.php" class="nav-link <?= $currentPage == 'relia_uko.php' ? 'active' : ''; ?>">Reliability</a></li>
+                    <li><a href="produk_uko.php" class="nav-link <?= $currentPage == 'produk_uko.php' ? 'active' : ''; ?>">Produktifitas</a></li>
+                    <li><a href="nop_uko.php" class="nav-link">NOP Berulang</a></li>
+                </ul>
+            </li>
 
-                <!-- Merchant -->
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-toggle="submenu" data-target="merchantMenu" data-arrow="merchantArrow" title="Merchant">
-                        <i class="fas fa-store"></i><span>Merchant</span><i class="fas fa-angle-left right" id="merchantArrow"></i>
-                    </a>
-                    <ul class="submenu" id="merchantMenu">
-                        <li><a href="wpe_user.php" class="nav-link">Group Uker</a></li>
-                        <li><a href="produk_mpos_user.php" class="nav-link">Produktifitas</a></li>
-                        <li><a href="notfound.php" class="nav-link">Reliability FMS</a></li>
-                        <li><a href="notfound.php" class="nav-link">Time Series</a></li>
-                        <li><a href="vendor.php" class="nav-link">Group Vendor</a></li>
-                        <li><a href="notfound.php" class="nav-link">NOP Berulang</a></li>
-                        <a href="map_mesin.php" class="nav-link" title="Tracking EDC"><i class="fas fa-search"></i><span>Peta Mesin</span></a>
-                    </ul>
-                </li>
+            <!-- Merchant -->
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-toggle="submenu" data-target="merchantMenu" data-arrow="merchantArrow" title="Merchant">
+                    <i class="fas fa-store"></i><span>Merchant</span><i class="fas fa-angle-left right" id="merchantArrow"></i>
+                </a>
+                <ul class="submenu" id="merchantMenu">
+                    <li><a href="wpe_user.php" class="nav-link">Group Uker</a></li>
+                    <li><a href="notfound.php" class="nav-link">Produktifitas</a></li>
+                    <li><a href="notfound.php" class="nav-link">Reliability FMS</a></li>
+                    <li><a href="notfound.php" class="nav-link">Time Series</a></li>
+                    <li><a href="vendor.php" class="nav-link">Group Vendor</a></li>
+                    <li><a href="nop_merchant.php" class="nav-link">NOP Berulang</a></li>
+                    <a href="map_mesin.php" class="nav-link" title="Tracking EDC"><i class="fas fa-search"></i><span>Peta Mesin</span></a>
+                </ul>
+            </li>
 
                 <!-- BRILink -->
                 <li class="nav-item">
@@ -566,22 +565,22 @@ if ($res->num_rows > 0) {
                             <td class="text-center">
                                 <?php if ($row['status_done'] == 1): ?>
 
-    <button class="btn btn-warning btn-sm return-btn"
-        data-id="<?= $row['id'] ?>"
-        data-snmesin="<?= $row['sn_mesin'] ?>"
-        data-snsim="<?= $row['sn_simcard'] ?>">
-        🔁 Return
-    </button>
+                                    <button class="btn btn-warning btn-sm return-btn"
+                                        data-id="<?= $row['id'] ?>"
+                                        data-snmesin="<?= $row['sn_mesin'] ?>"
+                                        data-snsim="<?= $row['sn_simcard'] ?>">
+                                        🔁 Return
+                                    </button>
 
-<?php else: ?>
+                                <?php else: ?>
 
-    <button class="btn btn-warning-custom btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['id'] ?>">
-        <i class="fas fa-edit"></i> Edit
-    </button>
+                                    <button class="btn btn-warning-custom btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['id'] ?>">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
 
-<?php endif; ?>
+                                <?php endif; ?>
 
-</td>
+                            </td>
 
                         </tr>
 
@@ -750,52 +749,52 @@ if ($res->num_rows > 0) {
                 });
             });
         </script>
-       <script>
-document.querySelectorAll('.return-btn').forEach(btn => {
-    btn.addEventListener('click', function () {
+        <script>
+            document.querySelectorAll('.return-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
 
-        const id = this.dataset.id;
-        const snMesin = this.dataset.snmesin;
-        const snSim = this.dataset.snsim;
+                    const id = this.dataset.id;
+                    const snMesin = this.dataset.snmesin;
+                    const snSim = this.dataset.snsim;
 
-        const pilihan = prompt(
-`Ketik angka:
+                    const pilihan = prompt(
+                        `Ketik angka:
 1 = Return MESIN
 2 = Return SIM
 3 = Return KEDUANYA`
-        );
+                    );
 
-        if (!pilihan) return;
+                    if (!pilihan) return;
 
-        let type = '';
-        if (pilihan == '1') type = 'mesin';
-        else if (pilihan == '2') type = 'sim';
-        else if (pilihan == '3') type = 'both';
-        else {
-            alert('Pilihan tidak valid!');
-            return;
-        }
+                    let type = '';
+                    if (pilihan == '1') type = 'mesin';
+                    else if (pilihan == '2') type = 'sim';
+                    else if (pilihan == '3') type = 'both';
+                    else {
+                        alert('Pilihan tidak valid!');
+                        return;
+                    }
 
-        fetch('return_mpos.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `id=${id}&sn_mesin=${snMesin}&sn_sim=${snSim}&type=${type}`
-        })
-        .then(res => res.text())
-        .then(res => {
-            if (res === 'success') {
-                alert('✅ Return berhasil!');
-                location.reload();
-            } else {
-                alert('❌ Gagal return: ' + res);
-            }
-        });
+                    fetch('return_mpos.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `id=${id}&sn_mesin=${snMesin}&sn_sim=${snSim}&type=${type}`
+                        })
+                        .then(res => res.text())
+                        .then(res => {
+                            if (res === 'success') {
+                                alert('✅ Return berhasil!');
+                                location.reload();
+                            } else {
+                                alert('❌ Gagal return: ' + res);
+                            }
+                        });
 
-    });
-});
-</script>
+                });
+            });
+        </script>
 
 
 

@@ -223,7 +223,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 </a>
             </li>
 
-            <!-- UKO -->
+             <!-- UKO -->
             <li class="nav-item">
                 <a href="#" class="nav-link" data-toggle="submenu" data-target="ukoMenu" data-arrow="ukoArrow" title="UKO">
                     <i class="fas fa-user-tie"></i><span>UKO</span><i class="fas fa-angle-left right" id="ukoArrow"></i>
@@ -231,7 +231,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 <ul class="submenu" id="ukoMenu">
                     <li><a href="relia_uko.php" class="nav-link <?= $currentPage == 'relia_uko.php' ? 'active' : ''; ?>">Reliability</a></li>
                     <li><a href="produk_uko.php" class="nav-link <?= $currentPage == 'produk_uko.php' ? 'active' : ''; ?>">Produktifitas</a></li>
-                    <li><a href="notfound.php" class="nav-link">NOP Berulang</a></li>
+                    <li><a href="nop_uko.php" class="nav-link">NOP Berulang</a></li>
                 </ul>
             </li>
 

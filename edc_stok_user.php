@@ -293,7 +293,7 @@ while ($r = $qBranch->fetch_assoc()) if (!empty($r['branch_office'])) $branchLis
                 <ul class="submenu" id="ukoMenu">
                     <li><a href="relia_uko.php" class="nav-link <?= $currentPage == 'relia_uko.php' ? 'active' : ''; ?>">Reliability</a></li>
                     <li><a href="produk_uko.php" class="nav-link <?= $currentPage == 'produk_uko.php' ? 'active' : ''; ?>">Produktifitas</a></li>
-                    <li><a href="notfound.php" class="nav-link">NOP Berulang</a></li>
+                    <li><a href="nop_uko.php" class="nav-link">NOP Berulang</a></li>
                 </ul>
             </li>
 
