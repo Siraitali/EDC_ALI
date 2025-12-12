@@ -5,6 +5,18 @@ if (!isset($_SESSION['login']) || $_SESSION['level'] !== 'user') {
     exit;
 }
 $currentPage = basename($_SERVER['PHP_SELF']);
+// ===== AUTO LOGOUT TIDAK ADA AKTIVITAS =====
+$timeout = 1800; // 30 menit
+
+if (isset($_SESSION['last_activity'])) {
+    if (time() - $_SESSION['last_activity'] > $timeout) {
+        session_unset();
+        session_destroy();
+        header("Location: login.php?timeout=1");
+        exit;
+    }
+}
+$_SESSION['last_activity'] = time();
 
 $host = "localhost";
 $user = "root";

@@ -10,6 +10,19 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// ===== AUTO LOGOUT TIDAK ADA AKTIVITAS =====
+$timeout = 1800; // 30 menit
+
+if (isset($_SESSION['last_activity'])) {
+    if (time() - $_SESSION['last_activity'] > $timeout) {
+        session_unset();
+        session_destroy();
+        header("Location: login.php?timeout=1");
+        exit;
+    }
+}
+$_SESSION['last_activity'] = time();
+
 // Pagination setup
 $rowsOptions = [10, 25, 50, 100];
 $rowsPerPage = isset($_GET['rows']) && in_array((int)$_GET['rows'], $rowsOptions) ? (int)$_GET['rows'] : 10;

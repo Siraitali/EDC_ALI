@@ -123,17 +123,18 @@ $rekapNOP = $conn->query("
         }
 
         h2 {
-            text-align: center;
-            margin: 10px 0; /* lebih rapat */
-            color: #dc3545;
-            font-weight: 600;
-        }
+    text-align: center;
+    margin: 40px 0 20px 0; /* JARAK ATAS & BAWAH DIPERLEBAR */
+    color: #dc3545;
+    font-weight: 600;
+}
 
-        .card {
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: 20px; /* rapat antar card */
-        }
+.card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 50px; /* JARAK ANTAR CARD BIAR TIDAK KETIMPA */
+}
+
 
         table.dataTable thead th {
             background-color: #dc3545;
@@ -158,7 +159,7 @@ $rekapNOP = $conn->query("
             padding: 15px; 
             width: calc(100% - 250px);
             transition: all 0.5s ease;
-            margin-top: 20px; /* lebih dekat ke toolbar */
+            margin-top: 5px; /* lebih dekat ke toolbar */
         }
 
         body.sidebar-collapsed .main-content {
@@ -277,6 +278,18 @@ $(document).ready(function () {
 
 });
 </script>
+<script>
+const sidebar = document.querySelector('.sidebar');
+
+if (localStorage.getItem('sidebar-collapsed') === 'true') {
+    document.body.classList.add('sidebar-collapsed');
+}
+
+document.getElementById('sidebarToggle').addEventListener('click', function () {
+    document.body.classList.toggle('sidebar-collapsed');
+});
+</script>
+
 
 </body>
 </html>

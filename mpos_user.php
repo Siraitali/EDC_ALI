@@ -6,6 +6,19 @@
     }
     include 'koneksi.php';
     $msg = "";
+
+    // ===== AUTO LOGOUT TIDAK ADA AKTIVITAS =====
+$timeout = 1800; // 30 menit
+
+if (isset($_SESSION['last_activity'])) {
+    if (time() - $_SESSION['last_activity'] > $timeout) {
+        session_unset();
+        session_destroy();
+        header("Location: login.php?timeout=1");
+        exit;
+    }
+}
+$_SESSION['last_activity'] = time();
     // ====== AMBIL DATA SIM CARD ======
     $simCards = [];
     $qSim = $conn->query("SELECT sn_simcard FROM sim_card WHERE status = 'tersedia' ORDER BY sn_simcard ASC");
